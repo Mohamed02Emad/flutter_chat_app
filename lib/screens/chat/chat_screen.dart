@@ -21,8 +21,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context)  {
 
     return FutureBuilder(
-      future: getUserName(),
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+      future: getUserData(),
+      builder: (BuildContext context, AsyncSnapshot<Map<String, String>> snapshot) {
         return Scaffold(
           appBar: AppBar(
             title: const Text("Chat Screen"),
@@ -48,7 +48,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     FirebaseAuth.instance.signOut();
                   }
                 },
-              )
+              ),
             ],
           ),
           body: Container(
@@ -56,7 +56,8 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 const Expanded(child: Messages()),
                 MessageBox(sendMessage: (String message) {
-                  sendMessage(message , snapshot.data!);
+                  sendMessage(message , snapshot.data!['userName']!,
+                      snapshot.data!['userImage']);
                 }),
               ],
             ),
@@ -66,7 +67,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void sendMessage(String message, String userName) async {
+  void sendMessage(String message, String userName , String? userImage) async {
     if (message.trim().isNotEmpty) {
       final user = FirebaseAuth.instance.currentUser!;
       FirebaseFirestore.instance.collection(Constants.MESSAGES_COLLECTION).add({
@@ -74,17 +75,21 @@ class _ChatScreenState extends State<ChatScreen> {
         'created_at': DateTime.now(),
         'userId': user.uid,
         'userName': userName,
+        'userImage' : userImage
       });
     }
   }
 
-  Future<String> getUserName() async {
-    final userNameSnapshot = await FirebaseFirestore.instance
+  Future<Map<String , String>> getUserData() async {
+    final userSnapshot = await FirebaseFirestore.instance
         .collection(Constants.USERS_COLLECTION)
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
 
-    return userNameSnapshot.data()?['userName'];
+    return {
+      'userName':userSnapshot.data()?['userName'],
+      'userImage': userSnapshot.data()?['imageUrl']
+    };
 
   }
 

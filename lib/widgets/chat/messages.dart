@@ -43,10 +43,13 @@ class Messages extends StatelessWidget {
                             child: MessageBubble(
                                 userName: snapshot.data!.docs[index]
                                     ['userName'],
+                                userImage: snapshot.data!.docs[index]
+                                    ['userImage'],
                                 isMe: isMe,
                                 userId: snapshot.data!.docs[index]['userId'],
                                 message: snapshot.data!.docs[index]['text']
                                     .toString()),
+
                           );
                         });
                   }

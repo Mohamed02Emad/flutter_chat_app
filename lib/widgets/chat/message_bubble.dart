@@ -6,10 +6,12 @@ class MessageBubble extends StatelessWidget {
       required this.isMe,
       required this.message,
       required this.userName,
+      this.userImage,
       super.key});
 
   final String message;
   final String userId;
+  final String? userImage;
   final String userName;
   final bool isMe;
 
@@ -34,20 +36,42 @@ class MessageBubble extends StatelessWidget {
             ),
             border: Border.all(width: 0.5, color: Colors.grey),
           ),
-          child: Column(
-            crossAxisAlignment:
-                isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          child: Stack(
+            clipBehavior: Clip.none,
             children: [
-              Text(
-                userName,
-                style: TextStyle(color: isMe ? Colors.black : Colors.white),
-                textAlign: isMe ? TextAlign.end : TextAlign.start,
+              Column(
+                crossAxisAlignment:
+                    isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    userName,
+                    style: TextStyle(color: isMe ? Colors.black : Colors.white),
+                    textAlign: isMe ? TextAlign.end : TextAlign.start,
+                  ),
+                  Text(
+                    message,
+                    style: TextStyle(color: isMe ? Colors.black : Colors.white),
+                    textAlign: isMe ? TextAlign.end : TextAlign.start,
+                  ),
+                ],
               ),
-              Text(
-                message,
-                style: TextStyle(color: isMe ? Colors.black : Colors.white),
-                textAlign: isMe ? TextAlign.end : TextAlign.start,
-              ),
+              userImage != null
+                  ? Positioned(
+                      top: -20,
+                      left: isMe ? null : 112,
+                      right: isMe ? 112 : null,
+                      child: ClipOval(
+                        child: Image.network(
+                          userImage!,
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                        ),
+                      ))
+                  : const SizedBox(
+                      width: 0,
+                      height: 0,
+                    ),
             ],
           ),
         ),
