@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_app/utils/extentions.dart';
+import 'package:flutter_chat_app/widgets/auth/insert_image_widget.dart';
 import 'package:flutter_chat_app/widgets/mo_loading_button.dart';
 import 'package:flutter_chat_app/widgets/mo_text_field.dart';
 
@@ -7,13 +10,14 @@ class AuthFormWidget extends StatefulWidget {
   const AuthFormWidget({required this.submitForm, super.key});
 
   final Function(String? name, String email, String password, bool isLogin,
-      BuildContext ctx) submitForm;
+      BuildContext ctx, File? imagePicked) submitForm;
 
   @override
   State<AuthFormWidget> createState() => _AuthFormWidgetState();
 }
 
 class _AuthFormWidgetState extends State<AuthFormWidget> {
+  File? _selectedImage = null;
   final _emailController = TextEditingController();
   final _userNameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -40,6 +44,16 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
                 const SizedBox(
                   height: 8,
                 ),
+                AnimatedContainer(
+                  height: _isLogin ? 0 : 160,
+                  duration: const Duration(milliseconds: 200),
+                  child: _isLogin
+                      ? const SizedBox(
+                          width: 0,
+                          height: 0,
+                        )
+                      :  InsertImageWidget(selectImage: _selectImage,),
+                ),
                 _isLogin
                     ? const SizedBox(
                         height: 0,
@@ -51,11 +65,11 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
                         showIcon: true,
                         validate: (String text) {
                           final condition = text.length < 4 && text.isNotEmpty;
-                          validName = condition;
-                          return condition;
-                        },
-                        validationMessage: "Short Name",
-                      ),
+                    validName = condition;
+                    return condition;
+                  },
+                  validationMessage: "Short Name",
+                ),
                 const SizedBox(
                   height: 8,
                 ),
@@ -67,7 +81,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
                   showIcon: true,
                   validate: (String text) {
                     final condition = (text.contains("@").not() ||
-                            text.contains(".").not()) &&
+                        text.contains(".").not()) &&
                         text.isNotEmpty;
                     validEmail = condition;
                     return condition;
@@ -141,13 +155,14 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     FocusScope.of(context).unfocus();
 
     if (isValid) {
-      widget.submitForm(
-        _userNameController.text,
-        _emailController.text,
-        _passwordController.text,
-        _isLogin,
-        context,
-      );
+      widget.submitForm(_userNameController.text, _emailController.text,
+          _passwordController.text, _isLogin, context, _selectedImage);
+    }
+  }
+
+  void _selectImage(File? file) {
+    if (file != null) {
+      _selectedImage = file;
     }
   }
 }

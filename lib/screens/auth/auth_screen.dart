@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_chat_app/utils/constants.dart';
@@ -33,6 +36,7 @@ class _AuthScreenState extends State<AuthScreen> {
     String password,
     bool isLogin,
     BuildContext ctx,
+    File? pickedImage,
   ) async {
     UserCredential result;
     try {
@@ -45,6 +49,15 @@ class _AuthScreenState extends State<AuthScreen> {
       } else {
         result = await _fireBaseAuthInstance.createUserWithEmailAndPassword(
             email: email.trim(), password: password.trim());
+        String? imageUrl = null;
+        if(pickedImage != null) {
+          final ref = FirebaseStorage.instance
+              .ref()
+              .child('user_images')
+              .child("${result.user!.uid}.jpg");
+          await ref.putFile(pickedImage).whenComplete(() => {});
+          imageUrl = await ref.getDownloadURL();
+        }
         await FirebaseFirestore.instance
             .collection(Constants.USERS_COLLECTION)
             .doc(result.user!.uid)
@@ -52,6 +65,7 @@ class _AuthScreenState extends State<AuthScreen> {
           'userName': name,
           'email': email,
           'createdAt': DateTime.now().toUtc().toString(),
+          'imageUrl': imageUrl
         });
       }
     } on PlatformException catch (error) {
