@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_chat_app/utils/constants.dart';
 import 'package:flutter_chat_app/widgets/auth/auth_form.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -45,7 +46,7 @@ class _AuthScreenState extends State<AuthScreen> {
         result = await _fireBaseAuthInstance.createUserWithEmailAndPassword(
             email: email.trim(), password: password.trim());
         await FirebaseFirestore.instance
-            .collection('users')
+            .collection(Constants.USERS_COLLECTION)
             .doc(result.user!.uid)
             .set({
           'userName': name,
