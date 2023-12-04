@@ -1,4 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_chat_app/widgets/auth/auth_form.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -10,8 +14,51 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
+  final _fireBaseAuthInstance = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
+      body: AuthFormWidget(
+        submitForm: _submit,
+      ),
+    );
+  }
+
+  void _submit(
+    String? name,
+    String email,
+    String password,
+    bool isLogin,
+    BuildContext ctx,
+  ) async {
+    UserCredential result;
+    try {
+      if (isLogin) {
+        result = await _fireBaseAuthInstance
+            .signInWithEmailAndPassword(email: email.trim(), password: password.trim());
+        if(result.user == null){
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error")));
+        }
+      } else {
+        result = await _fireBaseAuthInstance.createUserWithEmailAndPassword(
+            email: email.trim(), password: password.trim());
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(result.user!.uid)
+            .set({
+          'userName': name,
+          'email': email,
+          'createdAt': DateTime.now().toUtc().toString(),
+        });
+      }
+    } on PlatformException catch (error) {
+      ScaffoldMessenger.of(ctx)
+          .showSnackBar(SnackBar(content: Text(error.message.toString())));
+    } catch (error) {
+      ScaffoldMessenger.of(ctx)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 }

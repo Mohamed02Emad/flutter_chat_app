@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_app/utils/constants.dart';
 
@@ -18,6 +19,30 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: const Text("Chat Screen"),
         centerTitle: true,
+        actions: [
+          DropdownButton(
+            icon: const Icon(Icons.more_vert),
+            dropdownColor: Theme.of(context).primaryIconTheme.color,
+            items: const [
+              DropdownMenuItem(
+                value: 'logout',
+                child: Row(
+                  children: [
+                    Icon(Icons.logout),
+                    SizedBox(width: 8),
+                    Text("Logout"),
+                  ],
+                ),
+              ),
+            ],
+            onChanged: (value) {
+              if (value == 'logout'){
+                FirebaseAuth.instance.signOut();
+              }
+            },
+          )
+
+        ],
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
