@@ -45,12 +45,13 @@ class MessageBubble extends StatelessWidget {
                 children: [
                   Text(
                     userName,
-                    style: TextStyle(color: isMe ? Colors.black : Colors.white),
+                    style: TextStyle(color: isMe ? Colors.black : Colors.white , fontSize: 13),
                     textAlign: isMe ? TextAlign.end : TextAlign.start,
+                    maxLines: 1,
                   ),
                   Text(
                     message,
-                    style: TextStyle(color: isMe ? Colors.black : Colors.white),
+                    style: TextStyle(color: isMe ? Colors.black : Colors.white , fontSize: 11 ),
                     textAlign: isMe ? TextAlign.end : TextAlign.start,
                   ),
                 ],

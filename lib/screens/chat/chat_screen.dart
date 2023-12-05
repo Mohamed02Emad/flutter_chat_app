@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_app/widgets/chat/message_box.dart';
@@ -17,6 +18,28 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
 
+
+  @override
+  void initState() {
+    super.initState();
+    setupFirebaseMessaging();
+  }
+
+  void setupFirebaseMessaging() {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    // Listen when the app is in the foreground
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("onMessage: ${message.notification?.body}");
+    });
+
+    // Listen when the app is opened from a background or terminated state
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print("onMessageOpenedApp: ${message.notification?.body}");
+    });
+  }
+
+
   @override
   Widget build(BuildContext context)  {
 
@@ -29,6 +52,7 @@ class _ChatScreenState extends State<ChatScreen> {
             centerTitle: true,
             actions: [
               DropdownButton(
+                underline: Container(),
                 icon: const Icon(Icons.more_vert),
                 dropdownColor: Theme.of(context).primaryIconTheme.color,
                 items: const [
